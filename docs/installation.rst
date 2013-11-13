@@ -2,6 +2,8 @@
 Installation
 ============
 
+#) Make sure all `requirements <http://github.com/dokterbob/django-newsletter/blob/master/requirements.txt>`_ are properly setup.
+
 #)  Get it from the Cheese Shop::
 
         pip install django-newsletter
@@ -46,11 +48,11 @@ Installation
 
         NEWSLETTER_CONFIRM_EMAIL = False
 
-        For more granular control the ``NEWSLETTER_CONFIRM_EMAIL`` setting can be
-        overridden for each of subscribe, unsubscribe and update actions, by adding
-        ``NEWSLETTER_CONFIRM_EMAIL_SUBSCRIBE`` and/or
-        ``NEWSLETTER_CONFIRM_EMAIL_UNSUBSCRIBE`` and/or
-        ``NEWSLETTER_CONFIRM_EMAIL_UPDATE`` set to ``True`` or ``False``.
+    For more granular control the ``NEWSLETTER_CONFIRM_EMAIL`` setting can be
+    overridden for each of subscribe, unsubscribe and update actions, by adding
+    ``NEWSLETTER_CONFIRM_EMAIL_SUBSCRIBE`` and/or
+    ``NEWSLETTER_CONFIRM_EMAIL_UNSUBSCRIBE`` and/or
+    ``NEWSLETTER_CONFIRM_EMAIL_UPDATE`` set to ``True`` or ``False``.
 
 #)  Install and configure your preferred rich text widget (optional).
 
@@ -65,8 +67,8 @@ Installation
         # Using django-tinymce
         NEWSLETTER_RICHTEXT_WIDGET = "tinymce.widgets.TinyMCE"
 
-        If not set, django-newsletter will fall back to Django's default TextField
-        widget.
+    If not set, django-newsletter will fall back to Django's default TextField
+    widget.
 
 #)  Import subscription, unsubscription and archive URL's somewhere in your
     `urls.py`::
@@ -81,7 +83,11 @@ Installation
     app so the admin icons, CSS and JavaScript will be available where
     we expect it.
 
-#)  Create required data structure::
+#)  Create required data structure with `South <http://south.readthedocs.org/en/latest/about.html>`_ (recommended)::
+
+        ./manage.py migrate
+
+    Without South::
 
         ./manage.py syncdb
 
@@ -98,8 +104,8 @@ Installation
 
         ./manage.py test
 
-        If it does: that's a good sign. You'll probably have yourself a
-        working configuration!
+    If it does: that's a good sign. You'll probably have yourself a
+    working configuration!
 
 #)  Add jobs for sending out mail queues to `crontab <http://linuxmanpages.com/man5/crontab.5.php>`_::
 
