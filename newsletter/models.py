@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.sites.managers import CurrentSiteManager
+from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -14,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.utils.timezone import now
 
-from sorl.thumbnail import ImageField
+from importlib import import_module
 
 from .utils import (
     make_activation_code, get_default_sites, ACTIONS
@@ -23,6 +24,33 @@ from .utils import (
 logger = logging.getLogger(__name__)
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+NEWSLETTER_IMAGE_FIELD = getattr(settings, 'NEWSLETTER_IMAGE_FIELD', 'sorl.thumbnail.ImageField')
+
+
+def get_image_field():
+    if NEWSLETTER_IMAGE_FIELD:
+        try:
+            module, attr = NEWSLETTER_IMAGE_FIELD.rsplit(".", 1)
+            mod = import_module(module)
+            params = {
+                'blank': True,
+                'null': True,
+                'verbose_name': _('image')
+            }
+            if attr == 'FilerImageField':
+                params['related_name'] = 'newsletter_article_images'
+            else:
+                params['upload_to'] = 'newsletter/images/%Y/%m/%d'
+            return getattr(mod, attr)(**params)
+        except Exception as e:
+            # Catch ImportError and other exceptions too
+            # (e.g. user sets setting to an integer)
+            raise ImproperlyConfigured(
+                    "Error while importing setting "
+                    "NEWSLETTER_IMAGE_FIELD %r: %s" % (
+                        NEWSLETTER_IMAGE_FIELD, e
+                    )
+            )
 
 
 @python_2_unicode_compatible
@@ -450,10 +478,7 @@ class Article(models.Model):
     )
 
     # Make this a foreign key for added elegance
-    image = ImageField(
-        upload_to='newsletter/images/%Y/%m/%d', blank=True, null=True,
-        verbose_name=_('image')
-    )
+    image = get_image_field()
 
     # Message this article is associated with
     # TODO: Refactor post to message (post is legacy notation).

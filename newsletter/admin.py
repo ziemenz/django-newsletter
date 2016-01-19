@@ -27,8 +27,6 @@ from django.utils.formats import date_format
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.i18n import javascript_catalog
 
-from sorl.thumbnail.admin import AdminImageMixin
-
 from .models import (
     Newsletter, Subscription, Article, Message, Submission
 )
@@ -198,7 +196,7 @@ if (
         )
 
 
-class ArticleInline(AdminImageMixin, StackedInline):
+class BaseArticleInline(StackedInline):
     model = Article
     extra = 2
     fieldsets = (
@@ -215,6 +213,14 @@ class ArticleInline(AdminImageMixin, StackedInline):
         formfield_overrides = {
             models.TextField: {'widget': newsletter_settings.RICHTEXT_WIDGET},
         }
+
+try:
+    from sorl.thumbnail.admin import AdminImageMixin
+    class ArticleInline(AdminImageMixin, BaseArticleInline):
+        pass
+except:
+    class ArticleInline(BaseArticleInline):
+        pass
 
 
 class MessageAdmin(admin.ModelAdmin, ExtendibleModelAdminMixin):

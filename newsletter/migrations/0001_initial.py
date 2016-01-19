@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import sorl.thumbnail.fields
+from newsletter.models import get_image_field
 import newsletter.utils
 import django.utils.timezone
 from django.conf import settings
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=200, verbose_name='title')),
                 ('text', models.TextField(verbose_name='text')),
                 ('url', models.URLField(null=True, verbose_name='link', blank=True)),
-                ('image', sorl.thumbnail.fields.ImageField(upload_to='newsletter/images/%Y/%m/%d', null=True, verbose_name='image', blank=True)),
+                ('image', get_image_field()),
             ],
             options={
                 'ordering': ('sortorder',),
